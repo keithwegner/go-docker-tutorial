@@ -1,0 +1,35 @@
+# Start from the latest golang base
+FROM golang:latest
+
+# Add maintainer info
+LABEL maintainer="Keith Wegner <keith.wegner@gmail.com>"
+
+# Set current working dir inside the container
+WORKDIR /app
+
+# Build args, specify the log dir
+ARG LOG_DIR=/app/logs
+
+# Create the log directory
+RUN mkdir -p ${LOG_DIR}
+
+# Environment variables, specify the log file
+ENV LOG_FILE_LOCATION=${LOG_DIR}/app.log
+
+# Copy Go mod and sum files
+COPY go.mod go.sum ./
+
+# Copy the source from the current dir to the working dir inside the container
+COPY . .
+
+# Build the Go app
+RUN go build -o main .
+e
+# Expose the app's port to the outside world
+EXPOSE 8001
+
+# Declare volumes to mount
+VOLUME [${LOG_DIR}]
+
+# Run the binary produced by 'go build'
+CMD ["./main"]
